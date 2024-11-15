@@ -1,61 +1,62 @@
-### 项目名称：**Debian12-WebServer-Setup**
+### Project Name: **Debian12-WebServer-Setup**
 
-------
+---
 
-### **项目简介**
+### **Introduction**
 
-**Debian12-WebServer-Setup** 是一个轻量级工具集，专注于快速部署和管理基于 **Nginx** 和 **PHP** 的 Web 服务器。项目整理了在 **Debian 12** 环境中常用的配置、自动化脚本以及静态页面模板，帮助用户高效地搭建和维护 Web 服务。
+**Debian12-WebServer-Setup** is a lightweight toolkit designed to streamline the deployment and management of **Nginx** and **PHP** based web servers. This project collects commonly used configurations, automation scripts, and static page templates for a **Debian 12** environment, helping users efficiently build and maintain web services.
 
-------
+---
 
-### **功能特色**
+### **Features**
 
-1. **配置模板**
-   - 预配置的 Nginx、PHP、PHP-FPM 模板，适用于 LNMP 架构。
-   - 包括：
-     - 基础站点配置。
-     - 错误页面处理（如 `404` 页面）。
-     - 站点暂停服务模板。
-2. **自动化脚本**
-   - 提供自动化安装脚本，快速部署：
-     - Nginx。
-     - PHP（带 PHP-FPM 支持）。
-3. **默认页面**
-   - 精心设计的静态页面模板：
-     - **404 页面**：找不到页面提示。
-     - **503 页面**：站点暂停服务通知。
+1. **Configuration Templates**
+   - Predefined templates for Nginx, PHP, and PHP-FPM configurations tailored for LEMP stack deployment.
+   - Includes:
+     - Basic site setup.
+     - Error page handling (e.g., `404 Not Found` pages).
+     - Site maintenance mode templates.
+2. **Automation Scripts**
+   - Automated scripts to simplify installation of essential components:
+     - Nginx.
+     - PHP (with PHP-FPM support).
+3. **Default Pages**
+   - Professionally designed static page templates:
+     - **404 Page**: A friendly error page for missing content.
+     - **503 Page**: A site maintenance notification template.
 
-------
+---
 
-### **待办事项**
+### **To-Do**
 
-1. 添加数据库（如 MySQL 或 MariaDB）的自动化安装脚本。
-2. 增强安装脚本的错误处理机制。
-3. 提供更多静态页面模板（如 500 错误页面）。
-4. 编写测试脚本，验证配置和部署流程。
+1. Add automation scripts for database installation (e.g., MySQL or MariaDB).
+2. Enhance error handling in installation scripts for better usability.
+3. Provide additional static page templates (e.g., `500 Internal Server Error`).
+4. Write test scripts to verify configurations and deployment workflows.
 
-------
+---
 
-### **许可证**
+### **License**
 
-本项目基于 **MIT License** 开源，允许自由使用、修改和分发。使用时请保留原始版权声明。
+This project is open-source under the **MIT License**. You are free to use, modify, and distribute the code, but please retain the original copyright notice.
 
-------
+---
 
-### **贡献指南**
+### **Contribution Guidelines**
 
-1. **Fork 仓库**：创建你的副本以进行修改。
-2. **新建分支**：为每个新功能创建独立分支。
-3. **提交 PR**：描述你的改动并提交 Pull Request。
+We welcome contributions to improve this project! To contribute:
 
-------
+1. **Fork the repository**: Create your own copy to work on.
+2. **Create a new branch**: Use a separate branch for each feature or fix.
+3. **Submit a pull request (PR)**: Include a clear description of your changes.
 
-### **联系信息**
+---
 
-- **作者**：ethanaicode
-- **GitHub**：ethanaicode](https://github.com/ethanaicode)
+### **Contact**
 
-------
+- **Author**: ethanaicode
+- **GitHub**: [ethanaicode](https://github.com/ethanaicode)
 
-如果你对本项目有任何建议或疑问，请随时通过 GitHub 提交 Issue 或贡献代码！
+---
 
+Feel free to open an issue or contribute code to make this project even better!
