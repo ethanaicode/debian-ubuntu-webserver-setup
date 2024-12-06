@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# How to use: ./quick_new_user.sh <username>
+
 # Add a new user
 USERNAME=$1
 sudo useradd -m $USERNAME 

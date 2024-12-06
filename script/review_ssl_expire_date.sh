@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This script will review the SSL certificate expiration date for the given domains.
+# It will connect to the domain and get the certificate expiration date.
 
 # Define if we want to use localhost or the remote domain
 use_localhost=true
