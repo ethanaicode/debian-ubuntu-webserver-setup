@@ -21,16 +21,33 @@ request_certificate() {
     local domain="$1"
     local webroot="$2"
 
-    echo "正在为域名 $domain 使用 webroot $webroot 申请证书..."
+    # 如果域名以 www 开头，提取不带 www 的域名
+    if [[ "$domain" =~ ^www\.(.+)$ ]]; then
+        base_domain="${BASH_REMATCH[1]}"
+        echo "检测到域名 $domain 是 www 开头，将自动为 $base_domain 申请证书。"
 
-    sudo certbot certonly \
-        --webroot -w "$webroot" \
-        -d "$domain" \
-        -m "$EMAIL" \
-        --config-dir "$CUSTOM_PATH" \
-        --agree-tos \
-        --non-interactive \
-        --quiet
+        # 为 www 和不带 www 的域名一起申请证书
+        sudo certbot certonly \
+            --webroot -w "$webroot" \
+            -d "$domain" -d "$base_domain" \
+            -m "$EMAIL" \
+            --config-dir "$CUSTOM_PATH" \
+            --agree-tos \
+            --non-interactive \
+            --quiet
+    else
+        echo "正在为域名 $domain 使用 webroot $webroot 申请证书..."
+
+        # 仅为单个域名申请证书
+        sudo certbot certonly \
+            --webroot -w "$webroot" \
+            -d "$domain" \
+            -m "$EMAIL" \
+            --config-dir "$CUSTOM_PATH" \
+            --agree-tos \
+            --non-interactive \
+            --quiet
+    fi
 
     # 检查申请是否成功
     if [ $? -eq 0 ]; then
