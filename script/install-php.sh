@@ -7,7 +7,9 @@
 # Before running this script, make sure you have run the following command:
 # sudo apt update && sudo apt upgrade -y
 
-# Install PHP
+#############################################
+# Install PHP 7.4
+#############################################
 
 # Create downloads directory
 if [ ! -d /www/downloads ]; then
@@ -27,6 +29,11 @@ pkg-config sqlite3 libsqlite3-dev libsqlite3-0 \
 libxml2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libwebp-dev libxpm-dev \
 libfreetype6-dev libgmp-dev libmcrypt-dev libreadline-dev libzip-dev \
 libonig-dev libldap2-dev libkrb5-dev libssl-dev libicu-dev libxslt1-dev libtidy-dev libedit-dev
+
+# Delete the following line avoiding RSA_SSLV23_PADDING error
+# Only for php 7.4.33
+# Thanks to: https://forum.directadmin.com/threads/end-of-life-of-php-7-4.67500/page-2
+sed -i '/REGISTER_LONG_CONSTANT("OPENSSL_SSLV23_PADDING", RSA_SSLV23_PADDING, CONST_CS|CONST_PERSISTENT);/d' ext/openssl/openssl.c
 
 # Configure PHP
 ./configure --prefix=/www/server/php/74 \
@@ -76,22 +83,27 @@ make && make install
 # Copy PHP configuration
 cp php.ini-production /www/server/php/74/etc/php.ini
 
+# Note: if you use THISPROJECT/conf/php/php-fpm.conf instead of php-fpm.conf.default,
+#     you wont need to copy the file to php-fpm.d/www.conf
+
 # Copy PHP-FPM configuration
 cp /www/server/php/74/etc/php-fpm.conf.default /www/server/php/74/etc/php-fpm.conf
 
 # Copy PHP-FPM pool configuration
-# This is not necessary if you are using the default configuration
-# cp /www/server/php/74/etc/php-fpm.d/www.conf.default /www/server/php/74/etc/php-fpm.d/www.conf
+cp /www/server/php/74/etc/php-fpm.d/www.conf.default /www/server/php/74/etc/php-fpm.d/www.conf
 
 # Link PHP-FPM binary
+# If you have multiple PHP versions, you can create a symbolic link to the PHP version you want to use
+# like this: ln -s /www/server/php/74/bin/php /usr/bin/php74
 ln -s /www/server/php/74/sbin/php-fpm /usr/bin/php-fpm
 ln -s /www/server/php/74/bin/php /usr/bin/php
 ln -s /www/server/php/74/bin/phpize /usr/bin/phpize
-# If you have multiple PHP versions, you can create a symbolic link to the PHP version you want to use
-# like this: ln -s /www/server/php/74/bin/php /usr/bin/php74
 
 # Start PHP-FPM
 php-fpm
 
-# Set PHP-FPM to start on boot
-systemctl enable php-fpm
+# You can use THISPROJECT/conf/systemd/php-fpm.server to create a service file
+# for PHP-FPM. You can copy the file to /usr/lib/systemd/system/php-fpm.service
+# and reload systemd using systemctl daemon-reload
+# and then start PHP-FPM using systemctl start php-fpm
+# start on boot using systemctl enable php-fpm

@@ -1,11 +1,15 @@
 #!/bin/bash
 
-# update: 2024-11-15
+# update: 2024-12-25
 # os: Debian 12
 # Note: This script is not complete. It is just a snippet.
 
 # Before running this script, make sure you have run the following command:
 # sudo apt update && sudo apt upgrade -y
+
+#############################################
+# Install Nginx
+#############################################
 
 # Install Nginx
 sudo apt install nginx -y
