@@ -1,3 +1,5 @@
+# You can create this file in the service directory /usr/lib/systemd/system/
+# Remember to reload the service after creation by running the command: systemctl daemon-reload
 [Unit]
 Description=The PHP FastCGI Process Manager
 After=network.target

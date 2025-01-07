@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# update: 2024-12-25
-# os: Debian 12
+# update: 2025-01-07
+# os: Debian/Ubuntu
 # Note: This script is not complete. It is just a snippet.
 
 # Before running this script, make sure you have run the following command:

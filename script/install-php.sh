@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# update: 2024-11-15
-# os: Debian 12
+# update: 2025-01-07
+# os: Debian/Ubuntu
 # Note: This script is not complete. It is just a snippet.
 
 # Before running this script, make sure you have run the following command:
@@ -24,6 +24,7 @@ wget https://www.php.net/distributions/php-7.4.33.tar.gz \
 
 # Install PHP dependencies
 sudo apt install -y \
+build-essential \
 libxml2 libcurl4 openssl \
 pkg-config sqlite3 libsqlite3-dev libsqlite3-0 \
 libxml2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libwebp-dev libxpm-dev \

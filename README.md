@@ -1,10 +1,10 @@
-### Project Name: **Debian12-WebServer-Setup**
+### Project Name: **Debian-ubuntu-WebServer-Setup**
 
 ---
 
 ### **Introduction**
 
-**Debian12-WebServer-Setup** is a lightweight toolkit designed to streamline the deployment and management of **Nginx** and **PHP** based web servers. This project collects commonly used configurations, automation scripts, and static page templates for a **Debian 12** environment, helping users efficiently build and maintain web services.
+**Debian-ubuntu-WebServer-Setup** is a lightweight toolkit designed to streamline the deployment and management of **Nginx** and **PHP** based web servers. This project collects commonly used configurations, automation scripts, and static page templates for a **Debian/Ubuntu** environment, helping users efficiently build and maintain web services.
 
 ---
 
