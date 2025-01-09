@@ -3,11 +3,11 @@
 # 仅支持 Let's Encrypt 的 webroot 方式申请证书
 
 # 配置部分：为每个域名定义对应的 webroot
-keys=("example.com" "sub.example.com" "anotherdomain.com")  # 域名列表
-values=("/var/www/html" "/var/www/sub" "/var/www/another")  # 对应的 webroot 列表
+keys=("example.com" "sub.example.com")  # 域名列表
+values=("/var/www/html" "/var/www/sub")  # 对应的 webroot 列表
 
-EMAIL="your_email@example.com"        # 你的邮箱
-CUSTOM_PATH="/custom/path"            # 证书存放路径
+EMAIL="your_email@example.com"  # 你的邮箱
+CUSTOM_PATH=""  # 证书存放路径（留空则使用默认路径）
 
 # 检查是否安装 Certbot
 if ! command -v certbot &>/dev/null; then
@@ -16,42 +16,43 @@ if ! command -v certbot &>/dev/null; then
     sudo apt install certbot -y
 fi
 
+# 判断是否需要使用 sudo
+CERTBOT_CMD="certbot"
+if [ "$(id -u)" -ne 0 ]; then
+    CERTBOT_CMD="sudo certbot"
+fi
+
 # 申请证书的函数
 request_certificate() {
     local domain="$1"
     local webroot="$2"
 
-    # 如果域名以 www 开头，提取不带 www 的域名
+    # 处理 www 开头的域名
     if [[ "$domain" =~ ^www\.(.+)$ ]]; then
         base_domain="${BASH_REMATCH[1]}"
         echo "检测到域名 $domain 是 www 开头，将自动为 $base_domain 申请证书。"
-
-        # 为 www 和不带 www 的域名一起申请证书
-        sudo certbot certonly \
-            --webroot -w "$webroot" \
-            -d "$domain" -d "$base_domain" \
-            -m "$EMAIL" \
-            --config-dir "$CUSTOM_PATH" \
-            --agree-tos \
-            --non-interactive \
-            --quiet
+        domains="-d $domain -d $base_domain"
     else
-        echo "正在为域名 $domain 使用 webroot $webroot 申请证书..."
-
-        # 仅为单个域名申请证书
-        sudo certbot certonly \
-            --webroot -w "$webroot" \
-            -d "$domain" \
-            -m "$EMAIL" \
-            --config-dir "$CUSTOM_PATH" \
-            --agree-tos \
-            --non-interactive \
-            --quiet
+        domains="-d $domain"
     fi
+
+    # 组装 Certbot 命令
+    CERTBOT_OPTIONS="--webroot -w \"$webroot\" $domains -m \"$EMAIL\" --agree-tos --non-interactive --quiet"
+    
+    # 如果定义了 CUSTOM_PATH，则添加 --config-dir 选项
+    if [[ -n "$CUSTOM_PATH" ]]; then
+        CERTBOT_OPTIONS+=" --config-dir \"$CUSTOM_PATH\""
+    fi
+
+    echo "正在为域名 $domain 使用 webroot $webroot 申请证书..."
+    
+    # 执行 Certbot 申请证书
+    eval "$CERTBOT_CMD certonly $CERTBOT_OPTIONS"
 
     # 检查申请是否成功
     if [ $? -eq 0 ]; then
-        echo "✅ 证书申请成功！证书已存储到 $CUSTOM_PATH/live/$domain"
+        cert_path="${CUSTOM_PATH:-/etc/letsencrypt}/live/$domain"
+        echo "✅ 证书申请成功！证书已存储到 $cert_path"
     else
         echo "❌ 证书申请失败！请检查域名 $domain 的配置或日志。"
     fi
