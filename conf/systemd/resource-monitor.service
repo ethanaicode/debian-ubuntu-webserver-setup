@@ -1,0 +1,14 @@
+[Unit]
+Description=Resource Monitor Service
+After=network.target
+
+[Service]
+# 这里的脚本位置需要根据实际情况修改
+ExecStart=/usr/local/bin/resource_monitor.sh
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/resource_monitor/service.log
+StandardError=append:/var/log/resource_monitor/service_error.log
+
+[Install]
+WantedBy=multi-user.target
