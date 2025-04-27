@@ -84,14 +84,16 @@ make && make install
 # Copy PHP configuration
 cp php.ini-production /www/server/php/74/etc/php.ini
 
+# Download PHP-FPM configuration
+wget -P /www/server/php/74/etc https://raw.githubusercontent.com/ethanaicode/debian-ubuntu-webserver-setup/main/conf/php/php-fpm.conf
 # Note: if you use THISPROJECT/conf/php/php-fpm.conf instead of php-fpm.conf.default,
 #     you wont need to copy the file to php-fpm.d/www.conf
 
 # Copy PHP-FPM configuration
-cp /www/server/php/74/etc/php-fpm.conf.default /www/server/php/74/etc/php-fpm.conf
+# cp /www/server/php/74/etc/php-fpm.conf.default /www/server/php/74/etc/php-fpm.conf
 
 # Copy PHP-FPM pool configuration
-cp /www/server/php/74/etc/php-fpm.d/www.conf.default /www/server/php/74/etc/php-fpm.d/www.conf
+# cp /www/server/php/74/etc/php-fpm.d/www.conf.default /www/server/php/74/etc/php-fpm.d/www.conf
 
 # Link PHP-FPM binary
 # If you have multiple PHP versions, you can create a symbolic link to the PHP version you want to use
@@ -99,6 +101,10 @@ cp /www/server/php/74/etc/php-fpm.d/www.conf.default /www/server/php/74/etc/php-
 ln -s /www/server/php/74/sbin/php-fpm /usr/bin/php-fpm
 ln -s /www/server/php/74/bin/php /usr/bin/php
 ln -s /www/server/php/74/bin/phpize /usr/bin/phpize
+# If you have multiple PHP versions, you can create a symbolic link to the PHP version you want to use
+ln -s /www/server/php/74/sbin/php-fpm /usr/bin/php-fpm74
+ln -s /www/server/php/74/bin/php /usr/bin/php74
+ln -s /www/server/php/74/bin/phpize /usr/bin/phpize74
 
 # Start PHP-FPM
 php-fpm
