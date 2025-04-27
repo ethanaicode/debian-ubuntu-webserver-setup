@@ -2,6 +2,12 @@
 
 # How to use: ./quick_new_user.sh <username>
 
+# <username> is the username of the new user to be added
+if [ -z "$1" ]; then
+    echo "Usage: $0 <username>"
+    exit 1
+fi
+
 # Add a new user
 USERNAME=$1
 

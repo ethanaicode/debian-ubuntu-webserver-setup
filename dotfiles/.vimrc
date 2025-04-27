@@ -1,3 +1,8 @@
+" Vim configuration file
+" This file is used to configure Vim editor settings and behavior
+" This file is loaded when Vim starts
+" Located at ~/.vimrc
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Colors and Fonts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# update: 2025-01-07
+# update: 2025-04-27
 # os: Debian/Ubuntu
 # Note: This script is not complete. It is just a snippet.
 
