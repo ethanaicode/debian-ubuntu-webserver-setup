@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 脚本作用: 自动申请 Let's Encrypt SSL 证书
+# 适用于多个域名，支持 www 和非 www 域名
+# 需要安装 Certbot，并且服务器上已配置好对应的 webroot 路径
 # 仅支持 Let's Encrypt 的 webroot 方式申请证书
 
 # 配置部分：为每个域名定义对应的 webroot
