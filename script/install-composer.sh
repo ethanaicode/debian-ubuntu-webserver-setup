@@ -2,7 +2,6 @@
 
 # update: 2025-04-27
 # os: Debian/Ubuntu
-# Note: This script is not complete. It is just a snippet.
 
 # Before running this script, make sure you have run the following command:
 # sudo apt update && sudo apt upgrade -y
