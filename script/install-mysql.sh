@@ -11,10 +11,10 @@
 # 1. goto https://dev.mysql.com/downloads/repo/apt/
 
 # 2. Download the latest MySQL repository information package by running the following command:
-   wget https://dev.mysql.com/get/mysql-apt-config_0.8.33-1_all.deb
+   wget https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb
 
 # 3. Install the MySQL repository information using the file by running the following command:
-   sudo dpkg -i  mysql-apt-config_0.8.33-1_all.deb
+   sudo dpkg -i  mysql-apt-config_0.8.35-1_all.deb
 #    You can select the MySQL version you want to install. In this case, we will select MySQL 8.0.
 
 # 4. Update the server's package index to apply the new MySQL repository information.
