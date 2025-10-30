@@ -1,0 +1,5 @@
+# 覆写规则，分 rules, +rules, rules+ 三种方式
+
+# 将规则插入到原规则前面（优先使用）
++rules:
+  - DOMAIN-SUFFIX,daad.my,Direct
