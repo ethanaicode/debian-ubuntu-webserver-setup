@@ -4,3 +4,5 @@
 +rules:
   - DOMAIN-SUFFIX,daad.my,DIRECT
   - DOMAIN-SUFFIX,drtacs.vip,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DirectACCESS
+  - DOMAIN-SUFFIX,microsoftonline.com,DirectACCESS
