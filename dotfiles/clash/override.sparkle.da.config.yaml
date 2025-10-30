@@ -2,4 +2,5 @@
 
 # 将规则插入到原规则前面（优先使用）
 +rules:
-  - DOMAIN-SUFFIX,daad.my,Direct
+  - DOMAIN-SUFFIX,daad.my,DIRECT
+  - DOMAIN-SUFFIX,drtacs.vip,DIRECT
