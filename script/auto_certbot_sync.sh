@@ -3,6 +3,13 @@
 # 脚本作用: 自动同步 certbot 生成的证书到指定目录，并重启 nginx
 #     会自动调用 certbot renew 来更新证书，如果有更新，则自动同步到指定目录
 #     通过定时任务，可以实现证书的自动更新和同步
+# 注意：certbot 安装后默认会会自动创建一个定时任务来更新证书，这会导致本脚本失效（无法触发 deploy-hook）。
+#     因此请禁用 certbot 自带的定时任务：
+#         sudo systemctl disable --now certbot.timer
+#         sudo vim /etc/cron.d/certbot
+#     当然你也可以保留 certbot 自带的定时任务，不过需要修改配置以调用本脚本（不推荐）：
+#         在 /etc/letsencrypt/cli.ini 或者 /etc/letsencrypt/renewal/yourdomain.conf 中添加：
+#         renew_hook = /path/to/this/script/auto_certbot_sync.sh --deploy
 
 set -euo pipefail
 
