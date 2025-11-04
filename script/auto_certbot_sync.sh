@@ -162,12 +162,64 @@ main_mode() {
 }
 
 #####################################
+# 手动测试模式
+#####################################
+
+test_mode() {
+  ensure_root
+  local target="${1:-ALL}"
+
+  log "==== 手动测试模式启动 ===="
+
+  # 判断是单个域名还是全部
+  if [[ "$target" == "ALL" ]]; then
+    log "未指定域名，将测试全部映射（共 ${#keys[@]} 个）"
+    # 如果数组为空则退出
+    if [[ ${#keys[@]} -eq 0 ]]; then
+      fail "keys 数组为空，请在脚本中定义至少一个域名。"
+    fi
+    for ((i=0; i<${#keys[@]}; i++)); do
+      local domain="${keys[$i]}"
+      local mapped
+      mapped="$(find_map_value "$domain")"
+      if [[ -z "$mapped" ]]; then
+        mapped="$domain"
+        log "未在映射表中找到 $domain，使用同名目录：$mapped"
+      else
+        log "映射：$domain -> $mapped"
+      fi
+
+      copy_cert "$domain" "$mapped"
+    done
+  else
+    log "仅测试指定域名：$target"
+    local mapped
+    mapped="$(find_map_value "$target")"
+    if [[ -z "$mapped" ]]; then
+      mapped="$target"
+      log "未在映射表中找到 $target，使用同名目录：$mapped"
+    else
+      log "映射：$target -> $mapped"
+    fi
+    copy_cert "$target" "$mapped"
+  fi
+
+  nginx_test_and_reload
+  log "==== 手动测试模式结束（${target}） ===="
+}
+
+#####################################
 # 入口
 #####################################
+
 case "${1:-}" in
   --deploy)
     # 作为 certbot 的 deploy-hook 被调用
     deploy_mode
+    ;;
+  --test)
+    # 手动测试模式
+    test_mode "${2:-}"
     ;;
   *)
     # 正常手动/定时任务入口
