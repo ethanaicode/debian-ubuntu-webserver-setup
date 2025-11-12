@@ -11,6 +11,12 @@
 # Install PHP 7.4
 #############################################
 
+# Note: Unless you want to compile PHP 7.4 from source by yourself,
+#   it is recommended to use the packages from Ondřej Surý's PPA:
+#   https://launchpad.net/~ondrej/+archive/ubuntu/php
+#   You can find the relevant installation instructions at:
+#   https://doc.shejibiji.com/backend/php/php_advanced.html#%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8%E5%AE%89%E8%A3%85
+
 # Create downloads directory
 if [ ! -d /www/downloads ]; then
     mkdir -p /www/downloads
