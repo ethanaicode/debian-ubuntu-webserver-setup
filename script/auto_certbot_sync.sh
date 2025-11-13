@@ -3,7 +3,9 @@
 # 脚本作用: 自动同步 certbot 生成的证书到指定目录，并重启 nginx
 #     会自动调用 certbot renew 来更新证书，如果有更新，则自动同步到指定目录
 #     通过定时任务，可以实现证书的自动更新和同步
-# 注意：certbot 安装后默认会会自动创建一个定时任务来更新证书，这会导致本脚本失效（无法触发 deploy-hook）。
+# 注意1：本脚本仅适用于不使用 certbot 默认的证书位置，而需要手动移动到指定目录的情况
+#     最佳实践就是直接在 nginx 中配置 certbot 的证书路径（本脚本并不推荐使用）
+# 注意2：certbot 安装后默认会会自动创建一个定时任务来更新证书，这会导致本脚本失效（无法触发 deploy-hook）。
 #     因此请禁用 certbot 自带的定时任务：
 #         sudo systemctl disable --now certbot.timer
 #         sudo vim /etc/cron.d/certbot
@@ -21,10 +23,10 @@ set -euo pipefail
 : "${LIVE_PATH:=/etc/letsencrypt/live}"
 
 # 你期望证书复制到的目录根（提供默认值）
-CERT_PATH="${CERT_PATH:-/www/vhost/cert}"
+CERT_PATH="${CERT_PATH:-/www/certs}"
 
 # live 目录名与目标证书目录名的映射（等长数组）
-# 例：/etc/letsencrypt/live/example.com -> /www/vhost/cert/example.com
+# 例：/etc/letsencrypt/live/example.com -> /www/certs/example.com
 keys=("example.com")
 values=("example.com")
 
