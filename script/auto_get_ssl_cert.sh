@@ -11,6 +11,7 @@ values=("/var/www/html" "/var/www/sub")  # 对应的 webroot 列表
 
 EMAIL="your_email@example.com"  # 你的邮箱
 CUSTOM_PATH=""  # 证书存放路径（留空则使用默认路径）
+DEPLOY_HOOK="nginx -s reload"  # 证书更新后执行的命令（可选，如果不是 nginx 服务可修改或留空）
 
 # 检查是否安装 Certbot
 if ! command -v certbot &>/dev/null; then
@@ -45,6 +46,11 @@ request_certificate() {
     # 如果定义了 CUSTOM_PATH，则添加 --config-dir 选项
     if [[ -n "$CUSTOM_PATH" ]]; then
         CERTBOT_OPTIONS+=" --config-dir \"$CUSTOM_PATH\""
+    fi
+
+    # 如果定义了 DEPLOY_HOOK，则添加 --deploy-hook 选项
+    if [[ -n "$DEPLOY_HOOK" ]]; then
+        CERTBOT_OPTIONS+=" --deploy-hook \"$DEPLOY_HOOK\""
     fi
 
     echo "正在为域名 $domain 使用 webroot $webroot 申请证书..."
