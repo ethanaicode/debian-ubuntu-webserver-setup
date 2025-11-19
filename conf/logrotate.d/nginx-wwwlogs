@@ -1,0 +1,20 @@
+# /etc/logrotate.d/nginx-wwwlogs
+/www/wwwlogs/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    dateext
+    dateformat -%Y%m%d
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        # check if nginx pid file exists
+        if [ -f /run/nginx.pid ]; then
+            # gracefully reload nginx to close old log files and reopen new ones
+            kill -USR1 $(cat /run/nginx.pid)
+        fi
+    endscript
+}
