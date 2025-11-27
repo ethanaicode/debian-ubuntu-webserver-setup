@@ -1,1 +1,2 @@
-alias venv="source ./.venv/bin/activate"
+alias ve="source ./.venv/bin/activate"
+alias pyserver="python3 -m http.server 33333"
