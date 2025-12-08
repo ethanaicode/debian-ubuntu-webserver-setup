@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # secure_pack.sh — Create or update encrypted 7z archive with date suffix
 # Author: Ethan(cshengs1994@gmail.com)
-# Version: 1.0
+# Version: 1.1
 # Usage:
 #   To create new archive:
 #     ./secure_pack.sh new <sources...> [--out output_archive.7z]
@@ -72,10 +72,20 @@ if [[ "$MODE" == "new" ]]; then
   EXPANDED=()
   for item in "$@"; do
     shopt -s nullglob
-    matches=($item)
+    # 使用 eval 来正确处理通配符和空格
+    eval "matches=($item)"
     shopt -u nullglob
-    [[ ${#matches[@]} -eq 0 ]] && echo "⚠️  Warning: $item not found" && continue
-    EXPANDED+=("${matches[@]}")
+    
+    if [[ ${#matches[@]} -eq 0 ]]; then
+      # 如果没有匹配，检查是否是带空格的文件
+      if [[ -e "$item" ]]; then
+        EXPANDED+=("$item")
+      else
+        echo "⚠️  Warning: $item not found"
+      fi
+    else
+      EXPANDED+=("${matches[@]}")
+    fi
   done
 
   [[ ${#EXPANDED[@]} -eq 0 ]] && { echo "❌ No valid sources to pack."; exit 3; }
@@ -111,11 +121,20 @@ if [[ "$MODE" == "update" ]]; then
   echo "➕ Adding new files..."
   for item in "$@"; do
     shopt -s nullglob
-    matches=($item)
+    # 使用 eval 来正确处理通配符和空格
+    eval "matches=($item)"
     shopt -u nullglob
-    for match in "${matches[@]}"; do
-      cp -a "$match" "$TMPDIR"/
-    done
+    
+    if [[ ${#matches[@]} -eq 0 ]]; then
+      # 如果没有匹配，检查是否是带空格的文件
+      if [[ -e "$item" ]]; then
+        cp -a "$item" "$TMPDIR"/
+      fi
+    else
+      for match in "${matches[@]}"; do
+        cp -a "$match" "$TMPDIR"/
+      done
+    fi
   done
 
   BASE=$(basename "$ARCHIVE" .7z)
