@@ -58,7 +58,7 @@ echo
 if [[ "$MODE" == "new" ]]; then
   [[ $# -lt 1 ]] && { echo "Usage: $0 new <sources...> [--out output.7z]"; exit 1; }
 
-  # 若未指定输出文件，则自动命名
+  # 若未指定输出文件及路径，则自动在当前目录创建 Archive_时间戳.7z 文件
   if [[ -z "$OUT_PATH" ]]; then
     OUT_PATH="./Archive_${TS}.7z"
   fi
@@ -137,6 +137,8 @@ if [[ "$MODE" == "update" ]]; then
     fi
   done
 
+  # 默认情况使用原始文件名加时间戳，避免覆盖
+  # 如果你想按照自己的命名规则，可以在这里修改
   BASE=$(basename "$ARCHIVE" .7z)
   ARCHIVE_DIR=$(dirname "$ARCHIVE")
   NEW_PATH="${ARCHIVE_DIR}/${BASE}_${TS}.7z"
