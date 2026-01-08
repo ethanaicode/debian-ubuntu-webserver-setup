@@ -7,7 +7,7 @@
 
 # 配置部分：为每个域名定义对应的 webroot
 keys=("example.com" "sub.example.com")  # 域名列表
-values=("/var/www/html" "/var/www/sub")  # 对应的 webroot 列表
+values=("/var/www/_letsencrypt" "/var/www/_letsencrypt")  # 对应的 webroot 列表
 
 EMAIL="your_email@example.com"  # 你的邮箱
 CUSTOM_PATH=""  # 证书存放路径（留空则使用默认路径）
