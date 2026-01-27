@@ -9,32 +9,42 @@ use_localhost=false
 # Define the domains to review
 domains=("example.com" "anotherdomain.com")
 
-# Read domains from a file (same dir as script). If the file exists AND is non-empty,
-# override the built-in domains=(...) list. Ignore blank lines and lines starting with '#'.
+# Priority for domain selection:
+# 1. Command-line argument (if provided)
+# 2. domains.txt file (if exists and non-empty)
+# 3. Built-in domains array
 
-# Define the domains file to review
-DOMAINS_FILE="${DOMAINS_FILE:-domains.txt}"
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-DOMAINS_PATH="$SCRIPT_DIR/$DOMAINS_FILE"
+# Check if a domain is passed as a command-line argument
+if [[ -n "$1" ]]; then
+  domains=("$1")
+else
+  # Read domains from a file (same dir as script). If the file exists AND is non-empty,
+  # override the built-in domains=(...) list. Ignore blank lines and lines starting with '#'.
 
-if [[ -s "$DOMAINS_PATH" ]]; then
-  tmp_domains=()
-  while IFS= read -r line || [[ -n "$line" ]]; do
-    # trim leading/trailing whitespace
-    line="${line#"${line%%[![:space:]]*}"}"
-    line="${line%"${line##*[![:space:]]}"}"
+  # Define the domains file to review
+  DOMAINS_FILE="${DOMAINS_FILE:-domains.txt}"
+  SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+  DOMAINS_PATH="$SCRIPT_DIR/$DOMAINS_FILE"
 
-    # skip empty lines
-    [[ -z "$line" ]] && continue
-    # skip comments: lines starting with '#'
-    [[ "$line" =~ ^# ]] && continue
+  if [[ -s "$DOMAINS_PATH" ]]; then
+    tmp_domains=()
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      # trim leading/trailing whitespace
+      line="${line#"${line%%[![:space:]]*}"}"
+      line="${line%"${line##*[![:space:]]}"}"
 
-    tmp_domains+=("$line")
-  done < "$DOMAINS_PATH"
+      # skip empty lines
+      [[ -z "$line" ]] && continue
+      # skip comments: lines starting with '#'
+      [[ "$line" =~ ^# ]] && continue
 
-  # only override if we actually collected something
-  if ((${#tmp_domains[@]})); then
-    domains=("${tmp_domains[@]}")
+      tmp_domains+=("$line")
+    done < "$DOMAINS_PATH"
+
+    # only override if we actually collected something
+    if ((${#tmp_domains[@]})); then
+      domains=("${tmp_domains[@]}")
+    fi
   fi
 fi
 
