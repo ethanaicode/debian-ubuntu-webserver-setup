@@ -3,8 +3,9 @@
 # 脚本作用: 自动同步 certbot 生成的证书到指定目录，并重启 nginx
 #     会自动调用 certbot renew 来更新证书，如果有更新，则自动同步到指定目录
 #     通过定时任务，可以实现证书的自动更新和同步
+# 提示：本脚本仅用于个人处理以前证书目录不统一的问题，不推荐在新项目中使用
 # 注意1：本脚本仅适用于不使用 certbot 默认的证书位置，而需要手动移动到指定目录的情况
-#     最佳实践就是直接在 nginx 中配置 certbot 的证书路径（本脚本并不推荐使用）
+#     最佳实践就是直接在 nginx 中配置 certbot 的证书路径（并不推荐使用本脚本）
 # 注意2：certbot 安装后默认会会自动创建一个定时任务来更新证书，这会导致本脚本失效（无法触发 deploy-hook）。
 #     因此请禁用 certbot 自带的定时任务：
 #         sudo systemctl disable --now certbot.timer
@@ -12,6 +13,23 @@
 #     当然你也可以保留 certbot 自带的定时任务，不过需要修改配置以调用本脚本（不推荐）：
 #         在 /etc/letsencrypt/cli.ini 或者 /etc/letsencrypt/renewal/yourdomain.conf 中添加：
 #         renew_hook = /path/to/this/script/auto_certbot_sync.sh --deploy
+# 使用方法：
+#   1. 修改本脚本的可配置区，设置 LIVE_PATH、CERT_PATH 以及 keys/values 映射
+#   2. 将本脚本保存到服务器（如 /usr/local/bin/auto_certbot_sync.sh），并赋予可执行权限
+#        sudo chmod +x /usr/local/bin/auto_certbot_sync.sh
+#   3. 手动运行脚本测试（尝试复制证书文件）：
+#        sudo /usr/local/bin/auto_certbot_sync.sh --test [domain]
+#      其中 domain 可选，指定单个域名进行测试；不指定则测试全部映射
+#   4. 配置定时任务（如每天凌晨运行一次）：
+#        sudo crontab -e
+#      添加如下行：
+#        0 3 * * * /usr/local/bin/auto_certbot_sync.sh
+#   5. 确认 nginx 配置中使用了正确的证书路径（即 CERT_PATH 下的路径）
+# 注意事项：
+#   - 请确保本脚本有足够权限读取 /etc/letsencrypt/live 下的证书文件
+#   - 请确保 nginx 有权限读取 CERT_PATH 下的证书文件
+#   - 请根据实际情况调整 NGINX_BIN 的路径
+#   - 请定期检查日志文件，确保脚本正常运行
 
 set -euo pipefail
 
