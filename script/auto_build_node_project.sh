@@ -91,11 +91,35 @@ if ! git rev-parse --verify "$BRANCH" &> /dev/null; then
     exit 1
 fi
 
-# 切换到目标分支并拉取最新代码
-if ! git checkout "$BRANCH" || ! git pull origin "$BRANCH"; then
-    log "Error: Failed to checkout or pull branch $BRANCH."
+# 切换到目标分支
+if ! git checkout "$BRANCH"; then
+    log "Error: Failed to checkout branch $BRANCH."
     exit 1
 fi
+
+# 记录拉取前的 commit hash
+BEFORE_PULL=$(git rev-parse HEAD)
+log "Current commit: $BEFORE_PULL"
+
+# 拉取最新代码
+if ! git pull origin "$BRANCH"; then
+    log "Error: Failed to pull branch $BRANCH."
+    exit 1
+fi
+
+# 获取拉取后的 commit hash
+AFTER_PULL=$(git rev-parse HEAD)
+log "After pull commit: $AFTER_PULL"
+
+# 比较拉取前后的 commit hash
+if [ "$BEFORE_PULL" = "$AFTER_PULL" ]; then
+    log "No new changes detected. Skipping build."
+    log "======== Task Completed (No Build Required) ========"
+    log ""
+    exit 0
+fi
+
+log "New changes detected. Starting build..."
 
 # 执行构建命令
 if ! $BUILD_COMMAND; then
