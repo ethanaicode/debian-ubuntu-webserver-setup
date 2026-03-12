@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # secure_pack.sh — Create or update encrypted 7z archive with date suffix
 # Author: Ethan(cshengs1994@gmail.com)
-# Version: 1.1
+# Version: 1.2
 # Usage:
 #   To create new archive:
 #     ./secure_pack.sh new <sources...> [--out output_archive.7z]
 #   To update existing archive:
-#     ./secure_pack.sh update <existing_archive.7z> <files_to_add...
+#     ./secure_pack.sh update <existing_archive.7z> <files_to_add...>
+#   To list archive contents:
+#     ./secure_pack.sh list <archive.7z>
+#   To extract archive:
+#     ./secure_pack.sh extract <archive.7z> [--out output_dir]
 
 set -euo pipefail
 
@@ -18,14 +22,34 @@ if ! command -v 7z >/dev/null 2>&1; then
   exit 1
 fi
 
-if [[ $# -lt 2 ]]; then
+if [[ $# -lt 1 ]]; then
   echo "Usage:"
   echo "  $0 new <sources...> [--out output_archive.7z]"
   echo "  $0 update <existing_archive.7z> <files_to_add...>"
+  echo "  $0 list <archive.7z>"
+  echo "  $0 extract <archive.7z> [--out output_dir]"
   exit 1
 fi
 
 MODE="$1"; shift
+
+# === 对于 list 模式，不需要其他参数检查 ===
+if [[ "$MODE" == "list" ]]; then
+  [[ $# -lt 1 ]] && { echo "Usage: $0 list <archive.7z>"; exit 1; }
+  ARCHIVE="$1"
+  [[ ! -f "$ARCHIVE" ]] && { echo "❌ Archive not found: $ARCHIVE"; exit 4; }
+  
+  read -s -p "Enter password: " PASS
+  echo
+  [[ -z "$PASS" ]] && { echo "❌ Password empty — aborted."; exit 2; }
+  
+  echo "📋 Listing contents of: $ARCHIVE"
+  if ! 7z l "$ARCHIVE" -p"$PASS"; then
+    echo "❌ Invalid password or corrupted archive!"
+    exit 5
+  fi
+  exit 0
+fi
 
 # === 通用时间戳 ===
 TS=$(date +"%Y-%m-%d_%H%M%S")
@@ -72,20 +96,20 @@ if [[ "$MODE" == "new" ]]; then
   # 展开所有路径/通配符
   EXPANDED=()
   for item in "$@"; do
-    shopt -s nullglob
-    # 使用 eval 来正确处理通配符和空格
-    eval "matches=($item)"
-    shopt -u nullglob
-    
-    if [[ ${#matches[@]} -eq 0 ]]; then
-      # 如果没有匹配，检查是否是带空格的文件
-      if [[ -e "$item" ]]; then
-        EXPANDED+=("$item")
-      else
-        echo "⚠️  Warning: $item not found"
-      fi
+    # 先检查文件是否直接存在（支持带空格的文件名）
+    if [[ -e "$item" || -d "$item" ]]; then
+      EXPANDED+=("$item")
     else
-      EXPANDED+=("${matches[@]}")
+      # 如果文件不存在，尝试通配符展开
+      shopt -s nullglob
+      matches=($item)  # 不使用 eval，避免空格问题
+      shopt -u nullglob
+      
+      if [[ ${#matches[@]} -eq 0 ]]; then
+        echo "⚠️  Warning: $item not found"
+      else
+        EXPANDED+=("${matches[@]}")
+      fi
     fi
   done
 
@@ -123,20 +147,24 @@ if [[ "$MODE" == "update" ]]; then
 
   echo "➕ Adding new files..."
   for item in "$@"; do
-    shopt -s nullglob
-    # 使用 eval 来正确处理通配符和空格
-    eval "matches=($item)"
-    shopt -u nullglob
-    
-    if [[ ${#matches[@]} -eq 0 ]]; then
-      # 如果没有匹配，检查是否是带空格的文件
-      if [[ -e "$item" ]]; then
-        cp -a "$item" "$TMPDIR"/
-      fi
+    # 先检查文件是否直接存在（支持带空格的文件名）
+    if [[ -e "$item" || -d "$item" ]]; then
+      echo "  Adding: $item"
+      cp -a "$item" "$TMPDIR"/
     else
-      for match in "${matches[@]}"; do
-        cp -a "$match" "$TMPDIR"/
-      done
+      # 如果文件不存在，尝试通配符展开
+      shopt -s nullglob
+      matches=($item)  # 不使用 eval，避免空格问题
+      shopt -u nullglob
+      
+      if [[ ${#matches[@]} -eq 0 ]]; then
+        echo "⚠️  Warning: $item not found, skipping..."
+      else
+        for match in "${matches[@]}"; do
+          echo "  Adding: $match"
+          cp -a "$match" "$TMPDIR"/
+        done
+      fi
     fi
   done
 
@@ -150,6 +178,55 @@ if [[ "$MODE" == "update" ]]; then
 
   rm -rf "$TMPDIR"
   trap - EXIT
+  exit 0
+fi
+
+# ===============================================================
+# 📦 模式 3：解压压缩包
+# ===============================================================
+if [[ "$MODE" == "extract" ]]; then
+  [[ $# -lt 1 ]] && { echo "Usage: $0 extract <archive.7z> [--out output_dir]"; exit 1; }
+  
+  ARCHIVE="$1"
+  shift
+  [[ ! -f "$ARCHIVE" ]] && { echo "❌ Archive not found: $ARCHIVE"; exit 4; }
+
+  # 解析输出目录参数
+  OUT_DIR=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --out)
+        OUT_DIR="$2"
+        shift 2
+        ;;
+      *)
+        echo "❌ Unknown parameter: $1"
+        exit 1
+        ;;
+    esac
+  done
+
+  # 如果未指定输出目录，使用当前目录
+  if [[ -z "$OUT_DIR" ]]; then
+    OUT_DIR="."
+  fi
+
+  # 确保输出目录存在
+  mkdir -p "$OUT_DIR"
+
+  read -s -p "Enter password: " PASS
+  echo
+  [[ -z "$PASS" ]] && { echo "❌ Password empty — aborted."; exit 2; }
+
+  echo "🔍 Testing archive..."
+  if ! 7z t "$ARCHIVE" -p"$PASS" >/dev/null 2>&1; then
+    echo "❌ Invalid password or corrupted archive!"
+    exit 5
+  fi
+
+  echo "📂 Extracting to: $OUT_DIR"
+  7z x "$ARCHIVE" -p"$PASS" -o"$OUT_DIR"
+  echo "✅ Extraction complete!"
   exit 0
 fi
 
