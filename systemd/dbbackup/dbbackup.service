@@ -1,0 +1,8 @@
+# /etc/systemd/system/dbbackup.service
+
+[Unit]
+Description=Database Backup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/db_backup.sh
