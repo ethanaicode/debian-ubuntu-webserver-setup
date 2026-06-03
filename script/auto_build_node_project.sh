@@ -10,8 +10,8 @@
 ####################################
 # 本地仓库目录
 REPO_DIR="/path/to/your/local/node_project"
-# 目标分支名
-BRANCH="target-branch"
+# 目标分支名（默认为 main）
+BRANCH="main"
 # 构建命令，可以根据需要进行修改
 BUILD_COMMAND="npm run docs:build"
 # 日志目录      
@@ -69,10 +69,16 @@ log "Target Branch: $BRANCH"
 log "Build Command: $BUILD_COMMAND"
 
 ####################################
-# 检查 Git 是否可用
+# 检查必要的命令是否存在
 ####################################
 if ! command -v git &> /dev/null; then
     log "Error: Git is not installed."
+    exit 1
+fi
+
+if ! command -v npm &> /dev/null; then
+    log "Error: npm is not installed or is not in PATH."
+    log "Hint: if this runs from cron, load the Node.js environment or set PATH explicitly."
     exit 1
 fi
 
