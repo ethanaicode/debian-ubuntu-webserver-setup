@@ -78,6 +78,7 @@ fi
 
 if ! command -v npm &> /dev/null; then
     log "Error: npm is not installed or is not in PATH."
+    log "Current PATH: $PATH"
     log "Hint: if this runs from cron, load the Node.js environment or set PATH explicitly."
     exit 1
 fi
