@@ -2,7 +2,7 @@
 
 ```bash
 # Create backup directory
-sudo mkdir -p /backup/mysql
+sudo mkdir -p /www/backup/db
 
 # Create backup script
 sudo vim /usr/local/bin/db_backup.sh
