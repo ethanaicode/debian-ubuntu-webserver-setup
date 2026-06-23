@@ -2,6 +2,8 @@
 
 # Replace this sh to ~/.config/cleanup.sh and run it to clean up your local development environment on Mac.
 
+# display datetime
+echo "===== 任务开始 $(date '+%Y-%m-%d %H:%M:%S') ====="
 echo "开始清理本地开发环境..."
 
 # 1. 清理 SSH 密钥和 Keychain
@@ -56,3 +58,4 @@ rm -rf ~/tmp/*
 # yarn cache clean 2>/dev/null || true
 
 echo "清理完成！设备已重置为新状态"
+echo "===== 任务结束 $(date '+%Y-%m-%d %H:%M:%S') ====="
