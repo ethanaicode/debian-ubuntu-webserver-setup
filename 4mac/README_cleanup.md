@@ -5,7 +5,7 @@
 ## 文件说明
 
 - `cleanup.sh`：实际执行清理动作的脚本。
-- `com.ethanaicode.cleanup.plist`：LaunchAgent 配置文件模板。
+- `com.user.cleanup.plist`：LaunchAgent 配置文件模板。
 
 ## 先准备脚本
 
@@ -38,24 +38,24 @@ mkdir -p ~/Library/Logs/cleanup
 chmod +x ~/.config/cleanup.sh
 ```
 
-2. 将 `com.ethanaicode.cleanup.plist` 放到 `~/Library/LaunchAgents/`。
+2. 将 `com.user.cleanup.plist` 放到 `~/Library/LaunchAgents/`。
 
 3. 把 plist 里的 `YOUR_USERNAME` 替换成你的用户名，然后加载配置：
 
 ```bash
-launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.ethanaicode.cleanup.plist
+launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.user.cleanup.plist
 ```
 
 4. 如果想立刻验证，可以手动触发一次：
 
 ```bash
-launchctl kickstart -k gui/$UID/com.ethanaicode.cleanup
+launchctl kickstart -k gui/$UID/com.user.cleanup
 ```
 
 ## 卸载
 
 ```bash
-launchctl bootout gui/$UID ~/Library/LaunchAgents/com.ethanaicode.cleanup.plist
+launchctl bootout gui/$UID ~/Library/LaunchAgents/com.user.cleanup.plist
 ```
 
 ## 说明
