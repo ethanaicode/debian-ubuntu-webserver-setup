@@ -24,6 +24,7 @@ cat /dev/null > ~/.zsh_history
 echo "清理浏览器数据..."
 
 pkill -9 "Google Chrome"
+sleep 2
 rm -rf ~/Library/Application\ Support/Google/Chrome
 rm -rf ~/Library/Caches/Google/Chrome
 rm -rf ~/Library/Caches/ChromeAppCache
