@@ -9,7 +9,7 @@ echo "开始清理本地开发环境..."
 # 1. 清理 SSH 密钥和 Keychain
 echo "清理 SSH 和 Git 凭证..."
 
-rm -rf ~/.ssh/id_* ~/.ssh/config ~/.ssh/known_hosts
+rm -rf ~/.ssh/id_* ~/.ssh/config ~/.ssh/known_hosts*
 rm -f ~/.git-credentials
 security delete-generic-password -l "git" ~/Library/Keychains/login.keychain-db 2>/dev/null || true
 
