@@ -32,6 +32,7 @@ wget https://www.php.net/distributions/php-7.4.33.tar.gz \
 sudo apt install -y \
 build-essential \
 libxml2 libcurl4 openssl \
+autoconf \
 pkg-config sqlite3 libsqlite3-dev libsqlite3-0 \
 libxml2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libwebp-dev libxpm-dev \
 libfreetype6-dev libgmp-dev libmcrypt-dev libreadline-dev libzip-dev \
@@ -71,6 +72,7 @@ sed -i '/REGISTER_LONG_CONSTANT("OPENSSL_SSLV23_PADDING", RSA_SSLV23_PADDING, CO
 --enable-soap \
 --with-gettext \
 --enable-fileinfo \
+--with-zip \
 --enable-opcache \
 --with-ldap=shared \
 --without-gdbm \
@@ -89,6 +91,23 @@ make && make install
 
 # Copy PHP configuration
 cp php.ini-production /www/server/php/74/etc/php.ini
+
+# Install Redis extension (phpredis) to match apt package php7.4-redis
+cd /www/downloads
+wget -O redis-5.3.7.tgz https://pecl.php.net/get/redis-5.3.7.tgz \
+&& tar -xzvf redis-5.3.7.tgz \
+&& cd redis-5.3.7 \
+&& /www/server/php/74/bin/phpize \
+&& ./configure --with-php-config=/www/server/php/74/bin/php-config \
+&& make && make install
+
+# Enable Redis extension in php.ini only once
+if ! grep -q '^extension=redis$' /www/server/php/74/etc/php.ini; then
+    echo 'extension=redis' >> /www/server/php/74/etc/php.ini
+fi
+
+# Verify Redis extension is loaded
+/www/server/php/74/bin/php -m | grep -i redis
 
 # Download PHP-FPM configuration
 wget -P /www/server/php/74/etc https://raw.githubusercontent.com/ethanaicode/debian-ubuntu-webserver-setup/main/conf/php/php-fpm.conf
