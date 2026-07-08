@@ -1,0 +1,12 @@
+# /etc/systemd/system/nginx-404-ban.timer
+
+[Unit]
+Description=Run nginx 404 scanner auto-ban every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
