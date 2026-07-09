@@ -1,2 +1,9 @@
-alias ve="source ./.venv/bin/activate"
-alias pyserver="python3 -m http.server 33333"
+# Python virtual environment
+alias ve="source /path/to/venv/bin/activate"
+alias de="deactivate"
+alias updocs="cd /path/to/docs/ && npm run docs:dev"
+# SSH config
+alias catssh="cat ~/.ssh/config"
+# Diskutil unmount
+alias down='diskutil unmount $(diskutil list | grep "EXAMPLE_DISK_NAME" | awk "{print \$NF}")'
+alias up='diskutil apfs unlockVolume $(diskutil list | grep "EXAMPLE_DISK_NAME" | awk "{print \$NF}")'
