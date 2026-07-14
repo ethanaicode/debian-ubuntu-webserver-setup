@@ -1,7 +1,7 @@
-# /etc/systemd/system/nginx-404-ban.timer
+# /etc/systemd/system/nginx-ratelimit-ban.timer
 
 [Unit]
-Description=Run nginx 404 scanner auto-ban every minute
+Description=Run nginx rate-limit auto-ban every minute
 
 [Timer]
 OnCalendar=*-*-* *:*:00

@@ -1,0 +1,10 @@
+# /etc/systemd/system/nginx-ratelimit-ban.service
+
+[Unit]
+Description=Auto ban IPs repeatedly triggering nginx rate limiting
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/auto_ban_ratelimit.sh --window 120 --threshold 30 --ban-seconds 86400
