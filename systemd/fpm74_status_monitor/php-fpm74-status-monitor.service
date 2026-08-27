@@ -1,0 +1,10 @@
+# /etc/systemd/system/php-fpm74-status-monitor.service
+
+[Unit]
+Description=Monitor PHP-FPM 7.4 status metrics
+After=network-online.target nginx.service php-fpm74.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/php-fpm74_status_monitor.sh

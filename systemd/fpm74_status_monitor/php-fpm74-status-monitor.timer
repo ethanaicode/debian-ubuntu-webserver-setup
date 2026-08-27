@@ -1,0 +1,12 @@
+# /etc/systemd/system/php-fpm74-status-monitor.timer
+
+[Unit]
+Description=Run PHP-FPM 7.4 status monitor every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
