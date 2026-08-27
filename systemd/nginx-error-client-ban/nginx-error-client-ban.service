@@ -1,0 +1,10 @@
+# /etc/systemd/system/nginx-error-client-ban.service
+
+[Unit]
+Description=Auto ban IPs frequently appearing in nginx error logs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/auto_ban_error_client.sh --window 120 --threshold 30 --ban-seconds 86400

@@ -1,0 +1,12 @@
+# /etc/systemd/system/nginx-error-client-ban.timer
+
+[Unit]
+Description=Run nginx error-client auto-ban every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
