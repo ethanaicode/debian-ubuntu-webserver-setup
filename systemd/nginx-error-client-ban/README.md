@@ -17,12 +17,15 @@
 
 封禁发生在服务器的 `iptables INPUT` 链，可能影响 SSH、面板、API 和其他所有入站服务。请先确认 SSH 管理来源不会被误封，并准备好通过控制台或带外管理解除封禁。
 
+> **教训**：曾经出现过 `127.0.0.1` 被脚本误封，导致本机回环通信中断、业务大范围异常。脚本现已内置白名单机制防止这种情况，但仍建议按下面的流程谨慎启用。
+
 建议流程：
 
 1. 使用 `--dry-run` 运行并观察至少一段时间。
 2. 检查候选 IP 是否属于可信代理、办公网络、监控或管理员来源。
-3. 初次启用时使用较高阈值和较短封禁时间。
-4. 确认没有误封后，再交给 systemd 定时运行。
+3. 将确认可信的 IP（包括服务器自身、内网互通地址、SSH 管理来源）加入白名单。
+4. 初次启用时使用较高阈值和较短封禁时间。
+5. 确认没有误封后，再交给 systemd 定时运行。
 
 ## 工作方式
 
@@ -37,6 +40,46 @@ nginx error.log
 ```
 
 封禁由 ipset 的 TTL 自动过期，默认封禁 24 小时。脚本使用独立的 `nginx_error_client_ban` ipset，不会修改原 `nginx_ratelimit_ban` 集合。
+
+## 白名单机制
+
+脚本内置白名单，命中白名单的 IP 在统计阶段就会被跳过，既不会出现在候选列表中，也不会被封禁；封禁前还会二次核实白名单，双重保护。
+
+- **内置白名单**：`127.0.0.1` 和 `::1` 始终受保护，无法通过任何参数移除。
+- **`--whitelist`**：追加额外白名单 IP，支持逗号分隔，可重复使用：
+
+  ```bash
+  sudo /usr/local/bin/auto_ban_error_client.sh \
+    --whitelist 10.0.0.5,203.0.113.9 \
+    --dry-run
+  ```
+
+- **`--whitelist-file`**：从文件读取白名单，每行一个 IP，支持 `#` 注释：
+
+  ```text
+  # /etc/nginx-error-client-ban/whitelist.txt
+  10.0.0.5
+  203.0.113.9   # 监控探测节点
+  ```
+
+  ```bash
+  sudo /usr/local/bin/auto_ban_error_client.sh \
+    --whitelist-file /etc/nginx-error-client-ban/whitelist.txt \
+    --dry-run
+  ```
+
+建议加入白名单的 IP：
+
+- 服务器自身的内网 / 公网 IP
+- SSH、面板等管理入口来源 IP
+- 反向代理、CDN 回源、负载均衡器 IP
+- 监控探测、健康检查来源 IP
+
+每次运行都会在日志开头打印生效的白名单，便于确认配置是否正确：
+
+```text
+Whitelisted IPs (never banned): 127.0.0.1,::1,10.0.0.5,203.0.113.9
+```
 
 ## 安装
 
@@ -73,6 +116,14 @@ sudo /usr/local/bin/auto_ban_error_client.sh \
   --threshold 50
 ```
 
+同时验证白名单是否生效（白名单 IP 不应出现在候选列表中）：
+
+```bash
+sudo /usr/local/bin/auto_ban_error_client.sh \
+  --dry-run \
+  --whitelist-file /etc/nginx-error-client-ban/whitelist.txt
+```
+
 确认输出合理后，再启用定时器：
 
 ```bash
@@ -97,7 +148,11 @@ journalctl -u nginx-error-client-ban.service -n 50 --no-pager
 | `--threshold` | `30` | 窗口内同一 IP 出现次数达到该值时封禁 |
 | `--ban-seconds` | `86400` | 封禁时间，单位为秒，默认 24 小时 |
 | `--set-name` | `nginx_error_client_ban` | ipset 名称 |
+| `--whitelist` | - | 额外白名单 IP，逗号分隔，可重复使用 |
+| `--whitelist-file` | - | 白名单文件路径，每行一个 IP，支持 `#` 注释 |
 | `--dry-run` | - | 只输出候选 IP，不修改防火墙 |
+
+`127.0.0.1` 和 `::1` 始终位于白名单中，不受上述参数影响。
 
 systemd 默认配置位于 `nginx-error-client-ban.service`：
 
@@ -110,6 +165,12 @@ ExecStart=/usr/local/bin/auto_ban_error_client.sh --window 120 --threshold 30 --
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart nginx-error-client-ban.timer
+```
+
+强烈建议在 `ExecStart` 中加上 `--whitelist-file`，避免每次修改 service 文件才能调整白名单：
+
+```ini
+ExecStart=/usr/local/bin/auto_ban_error_client.sh --window 120 --threshold 30 --ban-seconds 86400 --whitelist-file /etc/nginx-error-client-ban/whitelist.txt
 ```
 
 ## 排查和解除封禁
