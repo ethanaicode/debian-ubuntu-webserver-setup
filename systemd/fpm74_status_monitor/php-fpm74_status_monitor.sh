@@ -7,7 +7,8 @@ set -euo pipefail
 
 STATUS_URL="http://127.0.0.1/phpfpm_74_status"
 LOG_DIR="/var/log/php-fpm-monitor"
-LOG_FILE="$LOG_DIR/php-fpm74-status.log"
+LOG_FILE=""
+LOG_FILE_SET=false
 STATE_FILE="/var/lib/php-fpm-monitor/php-fpm74.state"
 
 usage() {
@@ -17,7 +18,9 @@ Usage:
 
 Options:
   --url URL             PHP-FPM status URL (default: http://127.0.0.1/phpfpm_74_status)
-  --log-file PATH       Output log path (default: /var/log/php-fpm-monitor/php-fpm74-status.log)
+  --log-dir PATH        Directory for daily log files (default: /var/log/php-fpm-monitor)
+  --log-file PATH       Fixed output log path, disables daily log rotation
+                        (default: $LOG_DIR/php-fpm74-status-YYYY-MM-DD.log)
   --state-file PATH     Counter state path (default: /var/lib/php-fpm-monitor/php-fpm74.state)
   -h, --help            Show this help
 EOF
@@ -30,9 +33,15 @@ while [[ $# -gt 0 ]]; do
       STATUS_URL="$2"
       shift 2
       ;;
+    --log-dir)
+      [[ $# -ge 2 ]] || { echo "Missing value for --log-dir" >&2; exit 1; }
+      LOG_DIR="$2"
+      shift 2
+      ;;
     --log-file)
       [[ $# -ge 2 ]] || { echo "Missing value for --log-file" >&2; exit 1; }
       LOG_FILE="$2"
+      LOG_FILE_SET=true
       LOG_DIR="$(dirname "$LOG_FILE")"
       shift 2
       ;;
@@ -56,6 +65,11 @@ done
 if ! command -v curl >/dev/null 2>&1; then
   echo "curl is required. Install: apt install -y curl" >&2
   exit 1
+fi
+
+# Rotate to a new file per day unless --log-file pins a fixed path.
+if [[ "$LOG_FILE_SET" == false ]]; then
+  LOG_FILE="$LOG_DIR/php-fpm74-status-$(date '+%Y-%m-%d').log"
 fi
 
 mkdir -p "$LOG_DIR"

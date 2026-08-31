@@ -197,10 +197,10 @@ journalctl -u php-fpm74-status-monitor.service -n 50 --no-pager
 
 ## 日志和状态文件
 
-监控日志：
+监控日志按天分文件，默认路径规则为 `LOG_DIR/php-fpm74-status-YYYY-MM-DD.log`：
 
 ```text
-/var/log/php-fpm-monitor/php-fpm74-status.log
+/var/log/php-fpm-monitor/php-fpm74-status-2026-08-31.log
 ```
 
 上一次采样的状态文件：
@@ -209,11 +209,13 @@ journalctl -u php-fpm74-status-monitor.service -n 50 --no-pager
 /var/lib/php-fpm-monitor/php-fpm74.state
 ```
 
-实时查看流量：
+实时查看今天的流量：
 
 ```bash
-tail -f /var/log/php-fpm-monitor/php-fpm74-status.log
+tail -f /var/log/php-fpm-monitor/php-fpm74-status-"$(date '+%Y-%m-%d')".log
 ```
+
+如果通过 `--log-file` 指定了固定路径，则不会按天轮转，所有记录都写入同一个文件。旧日志不会自动清理，如需清理可自行添加 `find /var/log/php-fpm-monitor -name 'php-fpm74-status-*.log' -mtime +N -delete` 或接入 logrotate。
 
 脚本每次执行都会记录：
 
@@ -232,13 +234,20 @@ tail -f /var/log/php-fpm-monitor/php-fpm74-status.log
 sudo /usr/local/bin/php-fpm74_status_monitor.sh --help
 ```
 
-例如使用不同的 status URL 和日志路径：
+例如使用不同的 status URL 和日志目录（仍按天轮转）：
 
 ```bash
 sudo /usr/local/bin/php-fpm74_status_monitor.sh \
   --url http://127.0.0.1/phpfpm_74_status \
-  --log-file /var/log/php-fpm-monitor/php-fpm74-status.log \
+  --log-dir /var/log/php-fpm-monitor \
   --state-file /var/lib/php-fpm-monitor/php-fpm74.state
+```
+
+如果需要固定的单一日志文件（关闭按天轮转），改用 `--log-file`：
+
+```bash
+sudo /usr/local/bin/php-fpm74_status_monitor.sh \
+  --log-file /var/log/php-fpm-monitor/php-fpm74-status.log
 ```
 
 systemd service 默认执行：
