@@ -202,8 +202,12 @@ if [[ -z "$candidate_lines" ]]; then
   exit 0
 fi
 
-echo "Client IPs appearing in nginx error logs in last ${WINDOW_SECONDS}s:"
-echo "$candidate_lines"
+candidate_count="$(wc -l <<< "$candidate_lines")"
+echo "Found ${candidate_count} candidate client IP(s) in nginx error logs in last ${WINDOW_SECONDS}s."
+# Full per-IP counts are only useful for manual review, so keep them out of normal/systemd runs.
+if [[ "$DRY_RUN" -eq 1 ]]; then
+  echo "$candidate_lines"
+fi
 
 to_ban="$(awk -v n="$THRESHOLD" '$2 >= n {print $1}' <<< "$candidate_lines")"
 
