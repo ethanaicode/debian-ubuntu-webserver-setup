@@ -27,6 +27,8 @@
 4. 初次启用时使用较高阈值和较短封禁时间。
 5. 确认没有误封后，再交给 systemd 定时运行。
 
+> **缩小误杀范围**：如果发现某类正常错误（如上游超时、404）频繁触发误封，可以编辑 `auto_ban_error_client.sh` 中 gawk 脚本的匹配行（形如 `/^[0-9]{4}\/.../ && /client:/ {`），追加更多 `&& /xxx/` 条件，只统计特定错误关键字（例如 `&& /limiting requests/` 或 `&& /upstream timed out/`），像 `nginx-ratelimit-ban` 那样缩小统计范围，降低误封概率。
+
 ## 工作方式
 
 ```text
