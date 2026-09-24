@@ -1,3 +1,24 @@
+# ubuntu24
+# /etc/logrotate.d/nginx-wwwlogs
+/www/wwwlogs/*.log {
+        daily
+        missingok
+        rotate 14
+        compress
+        delaycompress
+        notifempty
+        create 0640 www-data adm
+        sharedscripts
+        prerotate
+                if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+                        run-parts /etc/logrotate.d/httpd-prerotate; \
+                fi \
+        endscript
+        postrotate
+                invoke-rc.d nginx rotate >/dev/null 2>&1
+        endscript
+}
+
 # /etc/logrotate.d/nginx-wwwlogs
 /www/wwwlogs/*.log {
     daily
@@ -12,6 +33,7 @@
     sharedscripts
     postrotate
         # check if nginx pid file exists
+        # use `nginx -T 2>&1 | grep -E '^\s*pid '` to find the pid file location if it's not in the default location
         if [ -f /run/nginx.pid ]; then
             # gracefully reload nginx to close old log files and reopen new ones
             kill -USR1 $(cat /run/nginx.pid)
