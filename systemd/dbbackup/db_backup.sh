@@ -9,7 +9,9 @@ BACKUP_DIR="/www/backup/db"
 # Create backup directory if it doesn't exist
 mkdir -p $BACKUP_DIR
 
+echo "Starting database backup for $DATE..."
 mysqldump -uroot -p'YourPassword' database_name | gzip > $BACKUP_DIR/database_name_$DATE.sql.gz
+echo "Database backup for $DATE completed."
 
 # If you want to backup specific databases, you can specify them like this:
 # mysqldump -uroot -p'YourPassword' --databases database1 database2 | gzip > $BACKUP_DIR/specific_databases_$DATE.sql.gz
@@ -19,4 +21,6 @@ mysqldump -uroot -p'YourPassword' database_name | gzip > $BACKUP_DIR/database_na
 # mysqldump -uroot -p'YourPassword' --all-databases | gzip > $BACKUP_DIR/all_databases_$DATE.sql.gz
 
 # Delete backups older than 7 days
+echo "Deleting backups older than 7 days..."
 find $BACKUP_DIR -type f -mtime +7 -delete
+echo "Old backups deleted."
