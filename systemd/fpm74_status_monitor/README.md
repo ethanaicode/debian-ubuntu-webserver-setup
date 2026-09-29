@@ -12,7 +12,9 @@ Traffic: 2.70req/sec
 Traffic (req/sec) = (本次 accepted conn - 上次 accepted conn) / 两次采样的实际间隔秒数
 ```
 
-## 重要：必须配置 PHP-FPM status
+## 重要
+
+### 必须配置 PHP-FPM status
 
 脚本依赖 PHP-FPM status 页面。只安装脚本和 systemd 文件是不够的，必须确认 PHP-FPM 7.4 pool 配置中存在：
 
@@ -34,7 +36,7 @@ listen = /run/php/php7.4-fpm.sock;
 
 如果你的 PHP-FPM 配置路径或 socket 不同，需要同步修改 Nginx 配置和脚本中的 URL。
 
-## 必须配置 Nginx status location
+### 必须配置 Nginx status location
 
 PHP-FPM 的 `pm.status_path` 只是注册 URI，仍然需要 Nginx 将这个 URI 转发到 PHP-FPM socket。请在 Nginx 的本机状态 server 中加入：
 
@@ -76,17 +78,16 @@ PHP-FPM、Nginx 和 systemd 通常已经存在；脚本使用 `curl` 请求本�
 
 ## 安装文件
 
-在仓库根目录执行：
+下载文件后复制到相应目录：
 
 ```bash
-sudo cp systemd/fpm74_status_monitor/php-fpm74_status_monitor.sh \
-  /usr/local/bin/php-fpm74_status_monitor.sh
+# 复制脚本
+sudo cp ./php-fpm74_status_monitor.sh /usr/local/bin/php-fpm74_status_monitor.sh
+# 增加执行权限
 sudo chmod +x /usr/local/bin/php-fpm74_status_monitor.sh
-
-sudo cp systemd/fpm74_status_monitor/php-fpm74-status-monitor.service \
-  /etc/systemd/system/
-sudo cp systemd/fpm74_status_monitor/php-fpm74-status-monitor.timer \
-  /etc/systemd/system/
+# 复制 systemd 文件
+sudo cp ./php-fpm74-status-monitor.service /etc/systemd/system/
+sudo cp ./php-fpm74-status-monitor.timer /etc/systemd/system/
 ```
 
 ## 应用 PHP-FPM 和 Nginx 配置
