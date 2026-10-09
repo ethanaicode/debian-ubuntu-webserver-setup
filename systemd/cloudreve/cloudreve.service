@@ -1,0 +1,25 @@
+# /etc/systemd/system/cloudreve.service
+
+[Unit]
+Description=Cloudreve
+Documentation=https://docs.cloudreve.org
+After=network.target
+After=mysqld.service
+Wants=network.target
+
+[Service]
+WorkingDirectory=/www/wwwroot/pan.yzitc.com
+ExecStart=/www/wwwroot/pan.yzitc.com/cloudreve
+Restart=on-abnormal
+RestartSec=5s
+KillMode=mixed
+
+# Pro 版本授权密钥
+# Environment="CR_LICENSE_KEY=你的授权密钥"
+
+# 日志输出
+StandardOutput=/www/wwwlogs/cloudreve.log
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
