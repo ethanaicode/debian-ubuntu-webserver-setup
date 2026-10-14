@@ -20,6 +20,8 @@
 }
 
 # /etc/logrotate.d/nginx-wwwlogs
+# Check whether Nginx runs as  www-data and adjust according to the actual configuration.
+# Check whether Nginx executable path is /usr/bin/nginx and adjust accordingly.
 /www/wwwlogs/*.log {
     daily
     missingok
@@ -27,16 +29,9 @@
     compress
     delaycompress
     notifempty
-    dateext
-    dateformat -%Y%m%d
     create 0640 www-data adm
     sharedscripts
     postrotate
-        # check if nginx pid file exists
-        # use `nginx -T 2>&1 | grep -E '^\s*pid '` to find the pid file location if it's not in the default location
-        if [ -f /run/nginx.pid ]; then
-            # gracefully reload nginx to close old log files and reopen new ones
-            kill -USR1 $(cat /run/nginx.pid)
-        fi
+        /usr/bin/nginx -s reopen >/dev/null 2>&1
     endscript
 }
