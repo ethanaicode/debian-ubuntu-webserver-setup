@@ -56,6 +56,7 @@ systemctl enable --now nginx-ratelimit-ban.timer
 |-----------|---------|---------|
 | `--log-dir` | `/www/wwwlogs` | Directory containing error logs |
 | `--log-pattern` | `*.error.log` | Glob for log file names |
+| `--keyword` | `limiting requests` | Plain-text keyword to count; repeatable, a line matching any keyword is counted. E.g. `--keyword "access forbidden by rule"` |
 | `--window` | `120` | Look back this many seconds 中文：回溯的时间窗口（秒） |
 | `--threshold` | `30` | Ban if triggered >= N times in window 中文：达到阈值时封禁 |
 | `--ban-seconds` | `86400` | Ban duration (24 h), auto-expires 中文：封禁持续时间（秒） |
